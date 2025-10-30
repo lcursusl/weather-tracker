@@ -18,7 +18,7 @@ public class Location {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @ManyToMany()
+    @ManyToMany
     @JoinColumn(name = "user_id")
     private List<User> users;
 

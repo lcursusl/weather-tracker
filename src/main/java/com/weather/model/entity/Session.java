@@ -15,7 +15,7 @@ public class Session {
     @Id
     private UUID id;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
