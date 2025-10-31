@@ -2,16 +2,17 @@ CREATE TABLE users
 (
     id       BIGSERIAL PRIMARY KEY,
     login    VARCHAR(64) UNIQUE NOT NULL,
-    password VARCHAR(255)        NOT NULL
+    password VARCHAR(255)       NOT NULL
 );
 
 CREATE TABLE locations
 (
     id        BIGSERIAL PRIMARY KEY,
-    name      varchar(64) UNIQUE NOT NULL,
+    name      VARCHAR(64)    NOT NULL,
     user_id   BIGINT REFERENCES users (id),
-    latitude  DECIMAL             NOT NULL,
-    longitude DECIMAL             NOT NULL
+    latitude  DECIMAL(10, 8) NOT NULL,
+    longitude DECIMAL(11, 8) NOT NULL,
+    CONSTRAINT unique_lat_lon UNIQUE (latitude, longitude)
 );
 
 CREATE TABLE sessions
