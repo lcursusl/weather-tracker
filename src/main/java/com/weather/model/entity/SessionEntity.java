@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "sessions")
-public class Session {
+public class SessionEntity {
     @Id
     private UUID id;
 
