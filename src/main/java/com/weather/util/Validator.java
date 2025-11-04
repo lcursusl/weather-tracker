@@ -23,8 +23,8 @@ public class Validator {
             throw new PasswordException("Password cannot be empty");
         } else if (!password.equals(repeatPassword)) {
             throw new RepeatPasswordException("Passwords do not match");
-        } else if (password.length() > 255) {
-            throw new PasswordException("Password is too long, it must be less than 256");
+        } else if (password.length() > 64) {
+            throw new PasswordException("Password is too long, it must be less than 65");
         }
     }
 }

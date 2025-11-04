@@ -18,6 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <spring.version>6.2.10</spring.version>
+        <jakarta.version>6.1.0</jakarta.version>
         <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
         <postgresql.version>42.7.2</postgresql.version>
         <hibernate.version>6.3.1.Final</hibernate.version>
@@ -27,6 +28,7 @@
         <junit.version>5.10.0</junit.version>
         <h2database.version>2.2.224</h2database.version>
         <lombok.version>1.18.42</lombok.version>
+        <jbcrypt.version>0.4</jbcrypt.version>
     </properties>
 
     <dependencies>
@@ -46,6 +48,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -110,6 +119,12 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${jbcrypt.version}</version>
         </dependency>
     </dependencies>
 
