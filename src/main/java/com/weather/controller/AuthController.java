@@ -32,10 +32,12 @@ public class AuthController {
     public String singUp(@Valid @ModelAttribute("registrationRequest") RegistrationRequest request,
                          BindingResult result,
                          HttpServletResponse response) {
+        if (!request.password().equals(request.repeatPassword())) {
+            result.rejectValue("repeatPassword", "repeatPassword.error", "Passwords do not match");
+        }
         if (result.hasErrors()) {
             return "sign-up";
         }
-
         try {
             UUID token = authService.register(request);
 
