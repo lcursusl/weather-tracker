@@ -19,6 +19,7 @@
 
         <spring.version>6.2.10</spring.version>
         <jakarta.version>6.1.0</jakarta.version>
+        <jakartaValidation.version>3.1.1</jakartaValidation.version>
         <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
         <postgresql.version>42.7.2</postgresql.version>
         <hibernate.version>6.3.1.Final</hibernate.version>
@@ -55,6 +56,12 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>${jakarta.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakartaValidation.version}</version>
         </dependency>
 
         <dependency>

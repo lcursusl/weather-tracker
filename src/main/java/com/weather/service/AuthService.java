@@ -5,7 +5,6 @@ import com.weather.model.dto.RegistrationRequest;
 import com.weather.model.entity.User;
 import com.weather.repository.SessionRepository;
 import com.weather.repository.UserRepository;
-import com.weather.util.Validator;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +21,6 @@ public class AuthService {
     }
 
     public UUID register(RegistrationRequest request) {
-        Validator.validateUsername(request.login());
-        Validator.validatePassword(request.password(), request.repeatPassword());
-
         User user = new User();
         user.setLogin(request.login());
         user.setPassword(BCrypt.hashpw(request.password(), BCrypt.gensalt()));
