@@ -17,28 +17,21 @@
 
     <h2 class="text-center mb-5">Sign In</h2>
 
-    <div class="row justify-content-center" th:if="${authorizationError != null}">
-        <div class="col-12 col-lg-4 col-md-6 col-sm-12">
-            <div class="alert alert-danger" role="alert" th:text="${authorizationError}">
-                Authorization error.
-            </div>
-        </div>
-    </div>
-
     <div class="row justify-content-center">
         <div class="col-12 col-lg-4 col-md-6 col-sm-12">
-            <form th:action="@{/auth/sign-in}" method="post" class="mt-4">
+            <form th:object="${authenticationRequest}" th:action="@{/auth/sign-in}" method="post" class="mt-4">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
+                    <label for="login" class="form-label">Login</label>
                     <div class="input-group has-validation">
                         <input type="text"
-                               id="username"
-                               name="username"
+                               id="login"
+                               th:field="*{login}"
                                class="form-control"
-                               th:classappend="${usernameError} ? ' is-invalid' : ''"
                                placeholder="you@example.com"
-                               required value=""/>
-                        <div class="invalid-feedback" th:if="${usernameError}" th:text="${usernameError}"></div>
+                               th:classappend="${#fields.hasErrors('login')} ? ' is-invalid' : ''" />
+                        <div class="invalid-feedback"
+                             th:if="${#fields.hasErrors('login')}"
+                             th:errors="*{login}">Invalid login</div>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -46,11 +39,12 @@
                     <div class="input-group has-validation">
                         <input type="password"
                                id="password"
-                               name="password"
+                               th:field="*{password}"
                                class="form-control"
-                               th:classappend="${passwordError} ? ' is-invalid' : ''"
-                               required value=""/>
-                        <div class="invalid-feedback" th:if="${passwordError}" th:text="${passwordError}"></div>
+                               th:classappend="${#fields.hasErrors('password')} ? ' is-invalid' : ''" />
+                        <div class="invalid-feedback"
+                             th:if="${#fields.hasErrors('password')}"
+                             th:errors="*{password}">Invalid password</div>
                     </div>
                 </div>
 

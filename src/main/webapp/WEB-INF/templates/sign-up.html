@@ -17,29 +17,22 @@
 
     <h2 class="text-center mb-5">Sign Up</h2>
 
-    <div class="row justify-content-center" th:if="${registrationError != null}">
-        <div class="col-12 col-lg-4 col-md-6 col-sm-12">
-            <div class="alert alert-danger" role="alert" th:text="${registrationError}">
-                Registration error.
-            </div>
-        </div>
-    </div>
-
     <div class="row justify-content-center">
         <div class="col-12 col-lg-4 col-md-6 col-sm-12">
             <form th:object="${registrationRequest}" th:action="@{/auth/sign-up}" method="post" class="mt-4">
                 <div class="mb-3">
-                    <label for="login" class="form-label">login</label>
+                    <label for="login" class="form-label">Login</label>
                     <div class="input-group has-validation">
                         <input type="text"
                                id="login"
                                th:field="*{login}"
                                class="form-control"
                                placeholder="you@example.com"
-                               th:classappend="${#fields.hasErrors('login')} ? ' is-invalid' : ''" />
+                               th:classappend="${#fields.hasErrors('login')} ? ' is-invalid' : ''"/>
                         <div class="invalid-feedback"
                              th:if="${#fields.hasErrors('login')}"
-                             th:errors="*{login}">Invalid login</div>
+                             th:errors="*{login}">Invalid login
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -49,10 +42,11 @@
                                id="password"
                                th:field="*{password}"
                                class="form-control"
-                               th:classappend="${#fields.hasErrors('password')} ? ' is-invalid' : ''" />
+                               th:classappend="${#fields.hasErrors('password')} ? ' is-invalid' : ''"/>
                         <div class="invalid-feedback"
                              th:if="${#fields.hasErrors('password')}"
-                             th:errors="*{password}">Invalid password</div>
+                             th:errors="*{password}">Invalid password
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -61,10 +55,11 @@
                            id="repeatPassword"
                            th:field="*{repeatPassword}"
                            class="form-control"
-                           th:classappend="${#fields.hasErrors('repeatPassword')} ? ' is-invalid' : ''" />
+                           th:classappend="${#fields.hasErrors('repeatPassword')} ? ' is-invalid' : ''"/>
                     <div class="invalid-feedback"
                          th:if="${#fields.hasErrors('repeatPassword')}"
-                         th:errors="*{repeatPassword}">Passwords must match</div>
+                         th:errors="*{repeatPassword}">Passwords must match
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 mt-3">Sign Up</button>

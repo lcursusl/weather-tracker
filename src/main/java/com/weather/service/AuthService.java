@@ -1,6 +1,9 @@
 package com.weather.service;
 
 import com.weather.exception.UserAlreadyRegisteredException;
+import com.weather.exception.UserNotFoundException;
+import com.weather.exception.WrongPasswordException;
+import com.weather.model.dto.AuthenticationRequest;
 import com.weather.model.dto.RegistrationRequest;
 import com.weather.model.entity.User;
 import com.weather.repository.SessionRepository;
@@ -34,5 +37,22 @@ public class AuthService {
         sessionRepository.save(token, user);
 
         return token;
+    }
+
+    public UUID authenticate(AuthenticationRequest request) {
+        User user = userRepository.findByLogin(request.login()).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!BCrypt.checkpw(request.password(), user.getPassword())) {
+            throw new WrongPasswordException("Wrong password");
+        }
+
+        UUID token = UUID.randomUUID();
+        sessionRepository.save(token, user);
+
+        return token;
+    }
+
+    public void logout(String token) {
+        sessionRepository.deleteById(UUID.fromString(token));
     }
 }
