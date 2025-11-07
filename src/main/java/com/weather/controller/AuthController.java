@@ -5,7 +5,9 @@ import com.weather.exception.UserNotFoundException;
 import com.weather.exception.WrongPasswordException;
 import com.weather.model.dto.AuthenticationRequest;
 import com.weather.model.dto.RegistrationRequest;
+import com.weather.model.entity.User;
 import com.weather.service.AuthService;
+import com.weather.service.SessionService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,9 +23,11 @@ import java.util.UUID;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
+    private final SessionService sessionService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, SessionService sessionService) {
         this.authService = authService;
+        this.sessionService = sessionService;
     }
 
     @GetMapping("/sign-up")
@@ -43,14 +47,13 @@ public class AuthController {
             return "sign-up";
         }
         try {
-            UUID token = authService.register(request);
-
+            User user = authService.register(request);
+            UUID token = sessionService.createSession(user);
             Cookie cookie = new Cookie("SESSION_ID", token.toString());
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             cookie.setMaxAge(3600);
             response.addCookie(cookie);
-
             return "redirect:/home";
         } catch (UserAlreadyRegisteredException e) {
             result.rejectValue("login", "login.error", e.getMessage());
@@ -72,14 +75,13 @@ public class AuthController {
             return "sign-in";
         }
         try {
-            UUID token = authService.authenticate(request);
-
+            User user = authService.authenticate(request);
+            UUID token = sessionService.createSession(user);
             Cookie cookie = new Cookie("SESSION_ID", token.toString());
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             cookie.setMaxAge(3600);
             response.addCookie(cookie);
-
             return "redirect:/home";
         } catch (UserNotFoundException e) {
             result.rejectValue("login", "login.error", e.getMessage());
@@ -98,8 +100,7 @@ public class AuthController {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("SESSION_ID")) {
-                    authService.logout(cookie.getValue());
-
+                    sessionService.deleteSession(cookie.getValue());
                     cookie.setValue("");
                     cookie.setPath("/");
                     cookie.setMaxAge(0);
@@ -108,7 +109,6 @@ public class AuthController {
                 }
             }
         }
-
         model.addAttribute("authenticationRequest", new AuthenticationRequest("", ""));
         return "redirect:/auth/sing-in";
     }
