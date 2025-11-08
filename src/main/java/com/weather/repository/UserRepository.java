@@ -10,8 +10,11 @@ import java.util.Optional;
 
 @Repository
 public class UserRepository {
-    @Autowired
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
+
+    public UserRepository(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     public void save(User user) {
         sessionFactory.getCurrentSession().persist(user);
