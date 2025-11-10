@@ -1,15 +1,17 @@
 package com.weather.controller;
 
-import com.weather.model.entity.Location;
+import com.weather.exception.UserNotFoundException;
+import com.weather.model.dto.LocationDto;
 import com.weather.model.entity.User;
 import com.weather.service.LocationService;
 import com.weather.service.SessionService;
+import com.weather.service.WeatherService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,17 +24,36 @@ import java.util.Optional;
 public class LocationController {
     private final LocationService locationService;
     private final SessionService sessionService;
+    private final WeatherService weatherService;
 
-    public LocationController(LocationService locationService, SessionService sessionService) {
+    public LocationController(LocationService locationService, SessionService sessionService, WeatherService weatherService) {
         this.locationService = locationService;
         this.sessionService = sessionService;
+        this.weatherService = weatherService;
     }
 
     @PostMapping
-    public String add(@Valid @ModelAttribute("location") Location location,
-                      Model model) {
-        model.addAttribute("location", location);
-        return "location";
+    public String add(@ModelAttribute LocationDto locationDto,
+                      BindingResult result,
+                      HttpServletRequest request) {
+        try {
+            Optional<User> user = Optional.empty();
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("SESSION_ID")) {
+                        user = sessionService.getUserByToken(cookie.getValue());
+                        break;
+                    }
+                }
+            }
+            locationService.addLocation(locationDto, user);
+
+            return "redirect:/home";
+        } catch (UserNotFoundException e){
+            result.rejectValue("error", "add.error", e.getMessage());
+            return "redirect:/home";
+        }
     }
 
     @PostMapping(("/{id}"))
@@ -41,7 +62,7 @@ public class LocationController {
     }
 
     @GetMapping("/search")
-    public String search(@RequestParam @NotBlank String location,
+    public String search(@RequestParam @NotBlank String searchQuery,
                          Model model,
                          HttpServletRequest request) {
         Optional<User> user = Optional.empty();
@@ -54,15 +75,11 @@ public class LocationController {
                 }
             }
         }
+        List<LocationDto> locations = weatherService.findLocationsByQuery(searchQuery);
+
         model.addAttribute("user", user.orElse(null));
-
-        List<LocationDto> locations = locationService.findLocations(location);
-
-        model.addAttribute("searchQuery", location);
+        model.addAttribute("searchQuery", searchQuery);
         model.addAttribute("foundLocations", locations);
         return "search-results";
     }
 }
-
-//Поиск локаций по названию - https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
-//Получение погоды по координатам локации - https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
