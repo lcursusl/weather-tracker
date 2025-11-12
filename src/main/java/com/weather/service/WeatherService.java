@@ -8,6 +8,7 @@ import com.weather.model.dto.WeatherDto;
 import com.weather.model.entity.Location;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,6 +25,7 @@ public class WeatherService {
     @Value("${weather.api.key}")
     private String apiKey;
 
+    @Transactional(readOnly = true)
     public List<LocationDto> findLocationsByQuery(String searchQuery) {
         String url = String.format(
                 "https://api.openweathermap.org/geo/1.0/direct?q=%s&limit=%d&appid=%s",
@@ -45,6 +47,7 @@ public class WeatherService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<WeatherDto> getWeather(List<Location> locations) {
         if (locations == null || locations.isEmpty()) {
             return new ArrayList<>();

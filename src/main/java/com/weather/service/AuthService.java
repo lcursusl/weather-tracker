@@ -9,6 +9,7 @@ import com.weather.model.entity.User;
 import com.weather.repository.UserRepository;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -18,6 +19,7 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public User register(RegistrationRequest request) {
         User user = new User();
         user.setLogin(request.login());
@@ -31,6 +33,7 @@ public class AuthService {
         return user;
     }
 
+    @Transactional
     public User authenticate(AuthenticationRequest request) {
         User user = userRepository.findByLogin(request.login())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));

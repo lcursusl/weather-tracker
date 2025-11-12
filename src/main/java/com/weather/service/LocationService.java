@@ -6,6 +6,7 @@ import com.weather.model.entity.Location;
 import com.weather.model.entity.User;
 import com.weather.repository.LocationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
+    @Transactional
     public void addLocation(LocationDto locationDto, Optional<User> user) {
         if (user.isEmpty()) {
             throw new UserNotFoundException("Log in or register before you can add a location");
@@ -26,6 +28,7 @@ public class LocationService {
         locationRepository.save(locationDto, user.get());
     }
 
+    @Transactional(readOnly = true)
     public List<Location> getUserLocations(Optional<User> user) {
         if (user.isEmpty()) {
             return new ArrayList<>();
@@ -33,6 +36,7 @@ public class LocationService {
         return locationRepository.findByUser(user.get());
     }
 
+    @Transactional
     public void deleteLocation(Long id, Optional<User> user) {
         if (user.isEmpty()) {
             throw new UserNotFoundException("Log in or register before you can add a location");

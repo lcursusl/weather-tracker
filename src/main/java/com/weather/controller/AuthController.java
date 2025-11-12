@@ -92,7 +92,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/sign-out")
+    @GetMapping("/sign-out")
     public String signOut(Model model,
                           HttpServletRequest request,
                           HttpServletResponse response) {
@@ -109,7 +109,6 @@ public class AuthController {
                 }
             }
         }
-        model.addAttribute("authenticationRequest", new AuthenticationRequest("", ""));
-        return "redirect:/auth/sing-in";
+        return "redirect:/home";
     }
 }

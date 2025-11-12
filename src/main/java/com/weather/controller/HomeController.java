@@ -46,7 +46,7 @@ public class HomeController {
         List<Location> locations = locationService.getUserLocations(user);
         List<WeatherDto> weathers = weatherService.getWeather(locations);
 
-        model.addAttribute("user", user);
+        model.addAttribute("user", user.orElse(null));
         model.addAttribute("weathers", weathers);
         return "home";
     }
