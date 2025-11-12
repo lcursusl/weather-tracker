@@ -22,14 +22,15 @@
         <jakartaValidation.version>3.1.1</jakartaValidation.version>
         <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
         <postgresql.version>42.7.2</postgresql.version>
-        <hibernate.version>6.3.1.Final</hibernate.version>
+        <hibernate.version>6.1.5.Final</hibernate.version>
         <jackson.version>2.16.0</jackson.version>
         <bcrypt.version>0.10.2</bcrypt.version>
-        <flyway.version>10.18.0</flyway.version>
+        <flyway.version>9.22.3</flyway.version>
         <junit.version>5.10.0</junit.version>
         <h2database.version>2.2.224</h2database.version>
         <lombok.version>1.18.42</lombok.version>
         <jbcrypt.version>0.4</jbcrypt.version>
+        <slf4j.version>2.0.9</slf4j.version>
     </properties>
 
     <dependencies>
@@ -132,6 +133,12 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${jbcrypt.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
     </dependencies>
 
