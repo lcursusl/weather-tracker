@@ -57,8 +57,29 @@ public class LocationController {
     }
 
     @PostMapping(("/{id}"))
-    public String delete(@PathVariable Long id, Model model) {
+    public String delete(@PathVariable Long id,
+                         BindingResult result,
+                         HttpServletRequest request) {
+        try {
+            Optional<User> user = Optional.empty();
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("SESSION_ID")) {
+                        user = sessionService.getUserByToken(cookie.getValue());
+                        break;
+                    }
+                }
+            }
+            locationService.deleteLocation(id, user);
 
+            return "redirect:/home";
+        }  catch (UserNotFoundException e){
+            result.rejectValue("error", "add.error", e.getMessage());
+            return "redirect:/home";
+        } catch (Exception e){
+            return "error";
+        }
     }
 
     @GetMapping("/search")

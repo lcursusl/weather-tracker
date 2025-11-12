@@ -33,4 +33,12 @@ public class LocationRepository {
                 .setParameter("user", user)
                 .list();
     }
+
+    public void deleteByIdAndUser(Long id, User user) {
+        sessionFactory.getCurrentSession()
+                .createQuery("delete from Location as l where l.id = :id and l.user = :user", Location.class)
+                .setParameter("id", id)
+                .setParameter("user", user)
+                .executeUpdate();
+    }
 }

@@ -32,4 +32,11 @@ public class LocationService {
         }
         return locationRepository.findByUser(user.get());
     }
+
+    public void deleteLocation(Long id, Optional<User> user) {
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("Log in or register before you can add a location");
+        }
+        locationRepository.deleteByIdAndUser(id, user.get());
+    }
 }
