@@ -1,13 +1,11 @@
 package com.weather.controller;
 
-import com.weather.exception.UserAlreadyRegisteredException;
-import com.weather.exception.UserNotFoundException;
-import com.weather.exception.WrongPasswordException;
 import com.weather.model.dto.AuthenticationRequest;
 import com.weather.model.dto.RegistrationRequest;
 import com.weather.model.entity.User;
 import com.weather.service.AuthService;
 import com.weather.service.SessionService;
+import com.weather.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,8 +13,12 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -24,10 +26,12 @@ import java.util.UUID;
 public class AuthController {
     private final AuthService authService;
     private final SessionService sessionService;
+    private final CookieUtil cookieUtil;
 
-    public AuthController(AuthService authService, SessionService sessionService) {
+    public AuthController(AuthService authService, SessionService sessionService, CookieUtil cookieUtil) {
         this.authService = authService;
         this.sessionService = sessionService;
+        this.cookieUtil = cookieUtil;
     }
 
     @GetMapping("/sign-up")
@@ -40,25 +44,19 @@ public class AuthController {
     public String singUp(@Valid @ModelAttribute("registrationRequest") RegistrationRequest request,
                          BindingResult result,
                          HttpServletResponse response) {
-        if (!request.password().equals(request.repeatPassword())) {
-            result.rejectValue("repeatPassword", "repeatPassword.error", "Passwords do not match");
-        }
         if (result.hasErrors()) {
             return "sign-up";
         }
-        try {
-            User user = authService.register(request);
-            UUID token = sessionService.createSession(user);
-            Cookie cookie = new Cookie("SESSION_ID", token.toString());
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(3600);
-            response.addCookie(cookie);
-            return "redirect:/home";
-        } catch (UserAlreadyRegisteredException e) {
-            result.rejectValue("login", "login.error", e.getMessage());
+        if (!request.password().equals(request.repeatPassword())) {
+            result.rejectValue("repeatPassword", "repeatPassword.error", "Passwords do not match");
             return "sign-up";
         }
+        User user = authService.register(request);
+        UUID token = sessionService.createSession(user);
+        Cookie cookie = cookieUtil.createCookie(token);
+        response.addCookie(cookie);
+
+        return "redirect:/home";
     }
 
     @GetMapping("/sign-in")
@@ -74,41 +72,21 @@ public class AuthController {
         if (result.hasErrors()) {
             return "sign-in";
         }
-        try {
-            User user = authService.authenticate(request);
-            UUID token = sessionService.createSession(user);
-            Cookie cookie = new Cookie("SESSION_ID", token.toString());
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(3600);
-            response.addCookie(cookie);
-            return "redirect:/home";
-        } catch (UserNotFoundException e) {
-            result.rejectValue("login", "login.error", e.getMessage());
-            return "sign-in";
-        } catch (WrongPasswordException e) {
-            result.rejectValue("password", "password.error", e.getMessage());
-            return "sign-in";
-        }
+        User user = authService.authenticate(request);
+        UUID token = sessionService.createSession(user);
+        Cookie cookie = cookieUtil.createCookie(token);
+        response.addCookie(cookie);
+
+        return "redirect:/home";
     }
 
     @GetMapping("/sign-out")
-    public String signOut(Model model,
-                          HttpServletRequest request,
+    public String signOut(HttpServletRequest request,
                           HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("SESSION_ID")) {
-                    sessionService.deleteSession(cookie.getValue());
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                    break;
-                }
-            }
-        }
+        Optional<String> sessionId = cookieUtil.getSessionId(request);
+        cookieUtil.invalidateCookie(response);
+        sessionService.deleteSession(sessionId.orElse(""));
+
         return "redirect:/home";
     }
 }

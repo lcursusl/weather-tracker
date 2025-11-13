@@ -6,7 +6,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,12 +17,7 @@ public class SessionRepository {
         this.sessionFactory = sessionFactory;
     }
 
-    public void save(UUID id, User user) {
-        SessionEntity sessionEntity = new SessionEntity();
-        sessionEntity.setId(id);
-        sessionEntity.setUser(user);
-        sessionEntity.setExpiresAt(LocalDateTime.now().plusHours(1));
-
+    public void save(SessionEntity sessionEntity) {
         sessionFactory.getCurrentSession().persist(sessionEntity);
     }
 

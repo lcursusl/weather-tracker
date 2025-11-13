@@ -28,8 +28,8 @@ public class AuthService {
         if (userRepository.findByLogin(request.login()).isPresent()) {
             throw new UserAlreadyRegisteredException("User already registered");
         }
-
         userRepository.save(user);
+
         return user;
     }
 
