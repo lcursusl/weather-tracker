@@ -2,7 +2,6 @@ package com.weather.util;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,10 +15,8 @@ public class CookieUtil {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("SESSION_ID")) {
-                    String sessionId = cookie.getValue();
-                    if (sessionId != null && !sessionId.isBlank()) {
-                        return Optional.of(sessionId);
-                    }
+                    return Optional.of(cookie.getValue());
+
                 }
             }
         }
@@ -34,11 +31,11 @@ public class CookieUtil {
         return cookie;
     }
 
-    public void invalidateCookie(HttpServletResponse response) {
+    public Cookie invalidateCookie() {
         Cookie cookie = new Cookie("SESSION_ID", "");
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        return cookie;
     }
 }

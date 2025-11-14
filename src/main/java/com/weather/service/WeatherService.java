@@ -45,8 +45,7 @@ public class WeatherService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(response.body(), new TypeReference<>() {
-            });
+            return mapper.readValue(response.body(), new TypeReference<>() {});
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -54,10 +53,6 @@ public class WeatherService {
 
     @Transactional(readOnly = true)
     public List<WeatherDto> getWeather(List<Location> locations) {
-        if (locations == null || locations.isEmpty()) {
-            return new ArrayList<>();
-        }
-
         List<WeatherDto> weathers = new ArrayList<>();
         for (Location location : locations) {
             try {

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -53,6 +52,7 @@ public class AuthController {
         }
         User user = authService.register(request);
         UUID token = sessionService.createSession(user);
+
         Cookie cookie = cookieUtil.createCookie(token);
         response.addCookie(cookie);
 
@@ -74,6 +74,7 @@ public class AuthController {
         }
         User user = authService.authenticate(request);
         UUID token = sessionService.createSession(user);
+
         Cookie cookie = cookieUtil.createCookie(token);
         response.addCookie(cookie);
 
@@ -83,9 +84,11 @@ public class AuthController {
     @GetMapping("/sign-out")
     public String signOut(HttpServletRequest request,
                           HttpServletResponse response) {
-        Optional<String> sessionId = cookieUtil.getSessionId(request);
-        cookieUtil.invalidateCookie(response);
-        sessionService.deleteSession(sessionId.orElse(""));
+        cookieUtil.getSessionId(request)
+                .ifPresent(sessionService::deleteSession);
+
+        Cookie cookie = cookieUtil.invalidateCookie();
+        response.addCookie(cookie);
 
         return "redirect:/home";
     }

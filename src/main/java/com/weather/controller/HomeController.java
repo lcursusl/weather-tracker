@@ -32,15 +32,17 @@ public class HomeController {
     }
 
     @GetMapping
-    public String getHomePage(Model model,
-                              HttpServletRequest request) {
-        Optional<String> sessionId = cookieUtil.getSessionId(request);
-        Optional<User> user = sessionService.getUserByToken(sessionId.orElse(""));
-        List<Location> locations = locationService.getUserLocations(user.orElse(null));
-        List<WeatherDto> weathers = weatherService.getWeather(locations);
+    public String getHomePage(Model model, HttpServletRequest request) {
+        Optional<User> user = cookieUtil.getSessionId(request)
+                .flatMap(sessionService::getUserByToken);
+
+        user.ifPresent(u -> {
+            List<Location> locations = locationService.getUserLocations(u);
+            List<WeatherDto> weathers = weatherService.getWeather(locations);
+            model.addAttribute("weathers", weathers);
+        });
 
         model.addAttribute("user", user.orElse(null));
-        model.addAttribute("weathers", weathers);
 
         return "home";
     }

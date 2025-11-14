@@ -1,5 +1,6 @@
 package com.weather.controller;
 
+import com.weather.exception.UserNotFoundException;
 import com.weather.model.dto.LocationDto;
 import com.weather.model.entity.User;
 import com.weather.service.LocationService;
@@ -40,9 +41,10 @@ public class LocationController {
     @PostMapping
     public String add(@ModelAttribute LocationDto locationDto,
                       HttpServletRequest request) {
-        Optional<String> sessionId = cookieUtil.getSessionId(request);
-        Optional<User> user = sessionService.getUserByToken(sessionId.orElse(""));
-        locationService.addLocation(locationDto, user.orElse(null));
+        Optional<User> user = cookieUtil.getSessionId(request)
+                .flatMap(sessionService::getUserByToken);
+
+        user.ifPresent(u -> locationService.addLocation(locationDto, u));
 
         return "redirect:/home";
     }
@@ -50,9 +52,11 @@ public class LocationController {
     @PostMapping(("/{id}"))
     public String delete(@PathVariable Long id,
                          HttpServletRequest request) {
-        Optional<String> sessionId = cookieUtil.getSessionId(request);
-        Optional<User> user = sessionService.getUserByToken(sessionId.orElse(""));
-        locationService.deleteLocation(id, user.orElse(null));
+        User user = cookieUtil.getSessionId(request)
+                .flatMap(sessionService::getUserByToken)
+                .orElseThrow(() -> new UserNotFoundException("Log in or register before you can add a location"));
+
+        locationService.deleteLocation(id, user);
 
         return "redirect:/home";
     }
@@ -61,8 +65,9 @@ public class LocationController {
     public String search(@RequestParam("searchQuery") @NotBlank String searchQuery,
                          Model model,
                          HttpServletRequest request) {
-        Optional<String> sessionId = cookieUtil.getSessionId(request);
-        Optional<User> user = sessionService.getUserByToken(sessionId.orElse(""));
+        Optional<User> user = cookieUtil.getSessionId(request)
+                .flatMap(sessionService::getUserByToken);
+
         List<LocationDto> locations = weatherService.findLocationsByQuery(searchQuery);
 
         model.addAttribute("user", user.orElse(null));

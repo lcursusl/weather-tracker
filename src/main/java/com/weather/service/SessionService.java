@@ -26,6 +26,7 @@ public class SessionService {
         sessionEntity.setId(token);
         sessionEntity.setUser(user);
         sessionEntity.setExpiresAt(LocalDateTime.now().plusHours(1));
+
         sessionRepository.save(sessionEntity);
 
         return token;

@@ -39,7 +39,7 @@
 
         <div>
             <h2>Search Results for "<span th:text="${searchQuery}">query</span>":</h2>
-            <div class="row">
+            <div class="row" th:if="${foundLocations != null and !foundLocations.isEmpty()}">
                 <div class="col-12 col-lg-3 col-md-6 mb-4" th:each="foundLocation : ${foundLocations}">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
@@ -48,7 +48,7 @@
                             <p class="card-text mb-1" th:text="'Longitude: ' + ${foundLocation.lon}"></p>
                             <p class="card-text mb-1" th:text="'Country: ' + ${foundLocation.country}"></p>
                             <p class="card-text mb-3" th:if="${foundLocation.state}"
-                                th:text="'State: ' + ${foundLocation.state}"></p>
+                               th:text="'State: ' + ${foundLocation.state}"></p>
                             <div class="mt-auto" th:if="${user}">
                                 <form th:action="@{/location}" method="post">
                                     <input type="hidden" name="name" th:value="${foundLocation.name}">
@@ -60,6 +60,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div th:if="${foundLocations == null or foundLocations.isEmpty()}" class="alert alert-info mt-4">
+                <h4 class="alert-heading">No locations found</h4>
             </div>
         </div>
     </div>

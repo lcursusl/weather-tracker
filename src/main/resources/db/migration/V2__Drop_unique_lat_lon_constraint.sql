@@ -1,0 +1,1 @@
+ALTER TABLE locations DROP CONSTRAINT IF EXISTS unique_lat_lon;
